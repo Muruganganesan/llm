@@ -1,7 +1,13 @@
 import streamlit as st
 import pandas as pd
-from src.search import search
-from src.summarizer import summarize
+import sys
+import os
+
+# 👇 src folder path add pannrom
+sys.path.append(os.path.abspath("src"))
+
+from search import search
+from summarizer import summarize
 
 # -------------------------------
 # Page config
@@ -29,20 +35,16 @@ documents = load_documents()
 query = st.text_input("🔍 Enter your query")
 summary_length = st.slider(
     "📝 Summary length (words)",
-    min_value=100,
-    max_value=500,
-    value=200,
-    step=50
+    100, 500, 200, 50
 )
 
 # -------------------------------
-# Search Button Logic
+# Search logic
 # -------------------------------
 if st.button("Search"):
     if query.strip() == "":
-        st.warning("⚠️ Please enter a query before searching.")
+        st.warning("⚠️ Please enter a query")
     else:
-        # ---- Search ----
         results = search(
             query=query,
             index_path="embeddings/vector_store.faiss",
@@ -50,19 +52,15 @@ if st.button("Search"):
             top_k=5
         )
 
-        # ---- Show Results ----
-        st.subheader("🔎 Top Relevant Results")
-
+        st.subheader("🔎 Top Results")
         combined_text = ""
 
-        for i, r in enumerate(results, start=1):
+        for i, r in enumerate(results, 1):
             st.markdown(f"**{i}.** {r[:200]}...")
             combined_text += " " + r
 
-        # ---- Summarization ----
         st.subheader("📌 Summary")
-
-        with st.spinner("Summarizing using LLM..."):
+        with st.spinner("Summarizing..."):
             summary = summarize(combined_text, summary_length)
 
         st.success(summary)
