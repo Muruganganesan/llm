@@ -1,8 +1,19 @@
-from transformers import pipeline
+import google.generativeai as genai
+import os
 
+# 🔑 API key (better: environment variable)
+genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
-summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
+model = genai.GenerativeModel("gemini-1.5-flash")
 
+def summarize(text, max_words):
+    prompt = f"""
+    Summarize the following text in about {max_words} words.
+    Be clear, concise, and avoid repetition.
 
-def summarize(text, max_len):
-return summarizer(text, max_length=max_len, min_length=50, do_sample=False)[0]['summary_text']
+    Text:
+    {text}
+    """
+
+    response = model.generate_content(prompt)
+    return response.text
