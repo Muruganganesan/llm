@@ -1,6 +1,8 @@
 streamlit
-pandas
+langchain
+langchain-community
+langchain-core
+transformers
 sentence-transformers
 faiss-cpu
-transformers
 torch
