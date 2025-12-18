@@ -1,13 +1,18 @@
 from langchain_community.vectorstores import FAISS
 from langchain_huggingface import HuggingFaceEmbeddings
-from langchain.llms import HuggingFaceHub
+from langchain_huggingface import HuggingFaceEndpoint
 from langchain.chains import RetrievalQA
-import os
 
+# =========================
+# EMBEDDINGS
+# =========================
 embeddings = HuggingFaceEmbeddings(
     model_name="sentence-transformers/all-MiniLM-L6-v2"
 )
 
+# =========================
+# LOAD FAISS INDEX
+# =========================
 db = FAISS.load_local(
     "faiss_index",
     embeddings,
@@ -16,16 +21,26 @@ db = FAISS.load_local(
 
 retriever = db.as_retriever()
 
-llm = HuggingFaceHub(
+# =========================
+# LLM (HuggingFace Endpoint)
+# =========================
+llm = HuggingFaceEndpoint(
     repo_id="google/flan-t5-base",
-    model_kwargs={"temperature": 0.3}
+    temperature=0.3,
+    max_new_tokens=256
 )
 
-qa = RetrievalQA.from_chain_type(
+# =========================
+# RAG CHAIN
+# =========================
+qa_chain = RetrievalQA.from_chain_type(
     llm=llm,
     retriever=retriever,
-    return_source_documents=False
+    chain_type="stuff"
 )
 
-def ask_question(question):
-    return qa.run(question)
+# =========================
+# ASK FUNCTION
+# =========================
+def ask_question(question: str) -> str:
+    return qa_chain.run(question)
