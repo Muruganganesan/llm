@@ -2,7 +2,9 @@ streamlit
 langchain
 langchain-community
 langchain-core
-transformers
-sentence-transformers
+langchain-text-splitters
+langchain-huggingface
+langchain-ollama
 faiss-cpu
-torch
+sentence-transformers
+pydantic
